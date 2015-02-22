@@ -1,0 +1,20 @@
+#!/bin/sh
+# Comparing reads 1 and 2 on PE data of lane 003
+
+# 31-mer count for reads1 in lane 003 
+jellyfish count -t 10 -m31 -C -s 300000000 -o peL3_r1.jf31 ###_r1.fa
+
+# 31-mer count for reads1 in lane 003
+jellyfish count -t 10 -m31 -C -s 300000000 -o peL3_r2.jf31 ###_r2.fa
+
+# compute matrix that compares the two jellyfish K-mer hashes
+kat comp -t 6 -o peL3_r1vsr2 peL3_r1.jf31_0 peL3_r2.jf31_0
+
+# plot "heat-map" 
+# expectation: 
+kat plot density -x 40 -y 40 -z 25000000 -o peL3_r1vsr2_density.png peL3_r1vsr2_main.mx
+
+# plot the distribution of k-mers from read1 that are shared with read 2 and those not shared with read 2 (and vice-versa)  
+# expectation: the non-shared k-mers should have low-frequency and shared k-mers should follow the gamma distribution 
+# with peak at the k-mer coverage
+kat plot spectra-mx -n -x 40 -y 300000000 -o peL3_r1vsr2_shared.png peL3_r1vsr2_main.mx
